@@ -5,7 +5,7 @@ scipy==1.11.4
 
 # Data fetching
 yfinance==0.2.36
-fredapi==0.6.1
+fredapi==0.5.2
 requests==2.31.0
 
 # Machine learning
