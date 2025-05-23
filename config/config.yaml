@@ -1,0 +1,110 @@
+# Global configuration for Yield Curve Relative Value Trading System
+
+# Data settings
+data:
+  start_date: "2010-01-01"
+  end_date: "2024-03-20"
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  fred_api_key: "YOUR_FRED_API_KEY"  # Replace with your FRED API key
+  yahoo_api:
+    retry_count: 3
+    timeout: 30
+  data_dir:
+    raw: "data/raw"
+    interim: "data/interim"
+    processed: "data/processed"
+
+# FRED API configuration
+fred:
+  api_key: "df2de59d691115cec25d648d66e1f40c"
+  series:
+    - "DGS2"  # 2-Year Treasury Constant Maturity Rate
+    - "DGS5"  # 5-Year Treasury Constant Maturity Rate
+    - "DGS10" # 10-Year Treasury Constant Maturity Rate
+    - "DGS30" # 30-Year Treasury Constant Maturity Rate
+    - "FEDFUNDS" # Federal Funds Rate
+    - "CPIAUCSL" # Consumer Price Index
+    - "UNRATE" # Unemployment Rate
+    - "GDP" # Gross Domestic Product
+
+# Spread configurations
+# spreads:
+#   2s10s:
+#     front_leg:
+#       fred_series: "DGS2"
+#       symbol: "ZT=F"  # 2-Year Treasury Note Futures
+#     back_leg:
+#       fred_series: "DGS10"
+#       symbol: "ZN=F"  # 10-Year Treasury Note Futures
+#   5s30s:
+#     front_leg:
+#       fred_series: "DGS5"
+#       symbol: "ZF=F"  # 5-Year Treasury Note Futures
+#     back_leg:
+#       fred_series: "DGS30"
+#       symbol: "ZB=F"  # 30-Year Treasury Bond Futures
+
+# Model settings
+models:
+  xgboost:
+    max_depth: 6
+    learning_rate: 0.1
+    n_estimators: 100
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+  
+  arima:
+    order: [2, 1, 2]  # (p, d, q)
+    seasonal_order: [1, 1, 1, 5]  # (P, D, Q, s)
+  
+  lstm:
+    units: [64, 32]
+    dropout: 0.2
+    batch_size: 32
+    epochs: 100
+    validation_split: 0.2
+    sequence_length: 10
+
+# Signal generation
+signals:
+  threshold: 0.5  # basis points
+  min_holding_period: 5  # days
+  max_position_size: 100  # contracts per leg
+
+# Backtest settings
+backtest:
+  initial_capital: 1000000  # $1M
+  transaction_cost: 5  # $ per contract
+  risk_free_rate: 0.02  # 2% annual
+  commission: 0.0001  # 1bp per trade
+
+# Feature engineering
+features:
+  window: 252  # Rolling window for feature calculation (1 year)
+  pca_components: 3  # Number of PCA components for yield curve
+  zscore_threshold: 3  # Threshold for outlier detection
+  yield_curve:
+    lookback_periods: [5, 10, 20, 60]  # days
+    momentum_windows: [5, 10, 20]  # days
+    volatility_window: 20  # days
+  
+  macro:
+    include_equity: true
+    include_vix: true
+    include_fx: false
+    lookback_periods: [5, 10, 20]  # days
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/app.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Output settings
+output:
+  figures_dir: "reports/figures"
+  models_dir: "models"
+  save_predictions: true
+  save_features: true 

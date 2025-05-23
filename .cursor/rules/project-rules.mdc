@@ -1,0 +1,203 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Curve Spread Relative Value Trading — Project Rules
+
+> Applies to files matching:
+> ```yaml
+> **/*.py
+> README.md
+> requirements.txt
+> .cursor/**/*.mdc
+> config/**/*.yaml
+> data/**
+> src/**
+> reports/**
+> models/**
+> ```
+
+---
+
+## 1. Project Structure
+
+/
+├── README.md
+├── config/
+│ ├── config.yaml
+│ └── curves.yaml
+├── data/
+│ ├── raw/
+│ ├── interim/
+│ └── processed/
+├── src/
+│ ├── data/
+│ │ ├── fetch_yahoo.py
+│ │ ├── fetch_fred.py
+│ │ └── data_cleaner.py
+│ ├── features/
+│ │ ├── yield_curve.py
+│ │ ├── macro_features.py
+│ │ └── feature_pipeline.py
+│ ├── models/
+│ │ ├── xgboost_model.py
+│ │ ├── arima_model.py
+│ │ ├── lstm_model.py
+│ │ └── training_pipeline.py
+│ ├── signals/
+│ │ ├── signal_generation.py
+│ │ └── position_sizing.py
+│ ├── backtest/
+│ │ ├── backtester.py
+│ │ ├── transaction_costs.py
+│ │ ├── carry_calculator.py
+│ │ └── performance.py
+│ ├── analysis/
+│ │ ├── shap_analysis.py
+│ │ ├── risk_analysis.py
+│ │ └── visualization.py
+│ └── utils/
+│ ├── config_loader.py
+│ ├── math_utils.py
+│ └── logging.py
+├── reports/
+│ └── figures/
+├── models/
+│ └── 2s10s_xgboost.pkl
+├── requirements.txt
+└── .cursor/
+└── project-rules.mdc
+
+markdown
+Copy
+Edit
+
+Each folder/file has a single, well-defined responsibility.
+
+---
+
+## 2. Coding Conventions
+
+- **PEP8**: 4-space indent, max 88 characters.  
+- **Naming**: `snake_case` for modules/functions/variables; `PascalCase` for classes.  
+- **Docstrings**: Google style for all public modules, classes, and functions.  
+- **Imports**: grouped and ordered  
+  1. Standard library  
+  2. Third-party  
+  3. Local/project  
+  — each group alphabetized.
+
+---
+
+## 3. Documentation & Dependencies
+
+- **README.md** must include:  
+  1. Project overview & objectives  
+  2. Setup (`pip install -r requirements.txt`)  
+  3. Execution steps, e.g.  
+     ```bash
+     python src/data/fetch_fred.py
+     python src/features/feature_pipeline.py
+     python src/models/training_pipeline.py
+     python src/backtest/backtester.py
+     ```  
+  4. Key outputs summary (equity curves, performance metrics, SHAP plots)
+
+- **requirements.txt**: pin versions, alphabetical, e.g.:  
+  ```text
+  pandas==1.5.3
+  numpy==1.24.2
+  scikit-learn==1.2.2
+  xgboost==1.7.5
+  statsmodels==0.14.0
+  tensorflow==2.12.0  # if LSTM used
+  yfinance==0.2.18
+  matplotlib==3.8.0
+  shap==0.42.1
+  pyyaml==6.0
+4. Logging & Error Handling
+Logging:
+
+Use Python’s logging at INFO level.
+
+Configure once in src/utils/logging_utils.py:
+
+python
+Copy
+Edit
+import logging
+def setup_logging():
+    logging.basicConfig(level=logging.INFO,
+                        format="%(asctime)s %(levelname)s [%(name)s] %(message)s")
+Import and call setup_logging() at entry points.
+
+Error Handling:
+
+Wrap all external I/O (file, API) in try/except.
+
+On exception, call logger.exception("…").
+
+Avoid bare except:; catch specific exceptions.
+
+5. Version Control Rules
+.gitignore must include:
+
+bash
+Copy
+Edit
+__pycache__/
+*.py[cod]
+data/raw/
+data/interim/
+models/
+reports/figures/
+.cursor/
+Branching:
+
+main: stable releases
+
+dev/*: feature development
+
+Commits: Conventional style:
+
+feat:, fix:, docs:, refactor:, test:
+
+Subject ≤50 chars, imperative mood.
+
+Body wrapped at 72 chars.
+
+6. Brief File Responsibilities
+File	Purpose
+config/config.yaml	Global experiment parameters & backtest settings
+config/curves.yaml	Curve definitions & DV01 weights for each spread
+data/raw/*	Immutable source data (Yahoo futures CSVs, FRED yields)
+data/interim/*	Merged/cleaned intermediate datasets
+data/processed/*	Final feature matrices & model inputs
+src/data/fetch_yahoo.py	Download bond futures prices via Yahoo API
+src/data/fetch_fred.py	Download treasury yields & macro data from FRED
+src/data/data_cleaner.py	Clean, align, and merge raw data streams
+src/features/yield_curve.py	Construct yield-curve features (spreads, curvature, PCA factors)
+src/features/macro_features.py	Transform macro indicators into predictive features
+src/features/feature_pipeline.py	Orchestrate full feature generation pipeline
+src/models/xgboost_model.py	Train & predict spread changes with XGBoost
+src/models/arima_model.py	ARIMA-based time-series forecasting
+src/models/lstm_model.py	LSTM-based sequence modeling
+src/models/training_pipeline.py	Walk-forward train/validate models
+src/signals/signal_generation.py	Convert model outputs into trading signals
+src/signals/position_sizing.py	Compute DV01-neutral futures positions & contract quantities
+src/backtest/backtester.py	Core engine: apply signals, simulate P&L, track equity curve
+src/backtest/transaction_costs.py	Futures transaction cost & slippage model
+src/backtest/carry_calculator.py	Carry & financing P&L calculation
+src/backtest/performance.py	Compute Sharpe, drawdowns, win rate, and summary tables
+src/analysis/shap_analysis.py	SHAP value calculations for model interpretability
+src/analysis/risk_analysis.py	Factor exposures & scenario analyses
+src/analysis/visualization.py	Plot equity curves, feature importances, risk metrics
+src/utils/config_loader.py	Load & validate YAML configs
+src/utils/math_utils.py	DV01, annualization, and other financial math helpers
+src/utils/logging_utils.py	Centralized logging setup
+reports/figures/*	Auto-saved charts & SHAP heatmaps
+models/*	Serialized model artifacts (e.g. 2s10s_xgboost.pkl)
+README.md	Project overview, setup, usage, and key outputs
+
+requirements.txt	Pinned Python dependencies

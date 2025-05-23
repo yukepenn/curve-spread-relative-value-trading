@@ -1,0 +1,63 @@
+# Yield curve spread configurations
+
+spreads:
+  "2s10s":  # 2-year vs 10-year Treasury spread
+    front_leg:
+      fred_id: "DGS2"  # 2-year Treasury yield
+      ticker: "ZT=F"   # 2-year Treasury note futures
+      dv01: 48.0       # DV01 in dollars per contract
+      multiplier: 2000 # Contract multiplier
+    
+    back_leg:
+      fred_id: "DGS10" # 10-year Treasury yield
+      ticker: "ZN=F"   # 10-year Treasury note futures
+      dv01: 96.0       # DV01 in dollars per contract
+      multiplier: 1000 # Contract multiplier
+    
+    hedge_ratio: 2.0   # Number of front contracts per back contract
+    model_types: ["xgboost", "arima", "lstm"]
+    description: "2-year vs 10-year Treasury spread"
+
+  "5s30s":  # 5-year vs 30-year Treasury spread
+    front_leg:
+      fred_id: "DGS5"  # 5-year Treasury yield
+      ticker: "ZF=F"   # 5-year Treasury note futures
+      dv01: 72.0       # DV01 in dollars per contract
+      multiplier: 1000 # Contract multiplier
+    
+    back_leg:
+      fred_id: "DGS30" # 30-year Treasury yield
+      ticker: "ZB=F"   # 30-year Treasury bond futures
+      dv01: 180.0      # DV01 in dollars per contract
+      multiplier: 1000 # Contract multiplier
+    
+    hedge_ratio: 2.5   # Number of front contracts per back contract
+    model_types: ["xgboost", "arima"]
+    description: "5-year vs 30-year Treasury spread"
+
+  "2s5s":   # 2-year vs 5-year Treasury spread
+    front_leg:
+      fred_id: "DGS2"  # 2-year Treasury yield
+      ticker: "ZT=F"   # 2-year Treasury note futures
+      dv01: 48.0       # DV01 in dollars per contract
+      multiplier: 2000 # Contract multiplier
+    
+    back_leg:
+      fred_id: "DGS5"  # 5-year Treasury yield
+      ticker: "ZF=F"   # 5-year Treasury note futures
+      dv01: 72.0       # DV01 in dollars per contract
+      multiplier: 1000 # Contract multiplier
+    
+    hedge_ratio: 1.5   # Number of front contracts per back contract
+    model_types: ["xgboost", "arima"]
+    description: "2-year vs 5-year Treasury spread"
+
+# Global spread settings
+settings:
+  min_spread: 0.0      # Minimum spread value to consider trading
+  max_spread: 500.0    # Maximum spread value to consider trading
+  min_volume: 1000     # Minimum daily volume for each leg
+  max_leverage: 5.0    # Maximum leverage ratio
+  position_limits:
+    max_contracts: 1000  # Maximum number of contracts per leg
+    max_notional: 100000000  # Maximum notional value per spread 
