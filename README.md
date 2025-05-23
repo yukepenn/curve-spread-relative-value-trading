@@ -53,7 +53,7 @@ This system implements a modular framework for:
 │ └── utils/
 │ ├── config_loader.py
 │ ├── math_utils.py
-│ └── logging_utils.py
+│ └── logging.py
 ├── reports/
 │ └── figures/
 ├── models/
